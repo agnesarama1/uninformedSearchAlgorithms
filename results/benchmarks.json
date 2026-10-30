@@ -1,0 +1,190 @@
+{
+  "golfers_8_4_9_spread": {
+    "algorithm": "DFS+backtracking",
+    "solved": true,
+    "aborted": false,
+    "generated": 408,
+    "expanded": 408,
+    "backtracks": 327,
+    "pruned": 0,
+    "max_depth": 9,
+    "max_frontier": 0,
+    "iterations": 0,
+    "b*": 1.7805,
+    "time_s": 0.0004,
+    "valid": true
+  },
+  "golfers_8_4_6_restarts": {
+    "algorithm": "DFS+backtracking+restarts",
+    "solved": true,
+    "aborted": false,
+    "generated": 28348,
+    "expanded": 13399,
+    "backtracks": 0,
+    "pruned": 14949,
+    "max_depth": 160,
+    "max_frontier": 0,
+    "iterations": 2,
+    "b*": 1.0455,
+    "time_s": 0.0595,
+    "valid": true
+  },
+  "golfers_8_4_10_published": {
+    "weeks": 10,
+    "source": "Aguado (2004)",
+    "valid": true
+  },
+  "sudoku_mrv": {
+    "easy": {
+      "algorithm": "BFS+backtracking",
+      "solved": true,
+      "aborted": false,
+      "generated": 49,
+      "expanded": 49,
+      "backtracks": 0,
+      "pruned": 0,
+      "max_depth": 49,
+      "max_frontier": 1,
+      "iterations": 0,
+      "b*": 1.0,
+      "time_s": 0.0001,
+      "valid": true
+    },
+    "medium": {
+      "algorithm": "BFS+backtracking",
+      "solved": true,
+      "aborted": false,
+      "generated": 205,
+      "expanded": 205,
+      "backtracks": 11,
+      "pruned": 0,
+      "max_depth": 53,
+      "max_frontier": 9,
+      "iterations": 0,
+      "b*": 1.0435,
+      "time_s": 0.0004,
+      "valid": true
+    },
+    "hard": {
+      "algorithm": "BFS+backtracking",
+      "solved": true,
+      "aborted": false,
+      "generated": 24880,
+      "expanded": 24880,
+      "backtracks": 1799,
+      "pruned": 0,
+      "max_depth": 60,
+      "max_frontier": 1003,
+      "iterations": 0,
+      "b*": 1.1435,
+      "time_s": 0.0626,
+      "valid": true
+    }
+  },
+  "sudoku_mrv_propagate": {
+    "easy": {
+      "algorithm": "BFS+backtracking",
+      "solved": true,
+      "aborted": false,
+      "generated": 0,
+      "expanded": 0,
+      "backtracks": 0,
+      "pruned": 0,
+      "max_depth": 0,
+      "max_frontier": 0,
+      "iterations": 0,
+      "b*": 0.0,
+      "time_s": 0.0,
+      "valid": true
+    },
+    "medium": {
+      "algorithm": "BFS+backtracking",
+      "solved": true,
+      "aborted": false,
+      "generated": 21,
+      "expanded": 11,
+      "backtracks": 3,
+      "pruned": 10,
+      "max_depth": 6,
+      "max_frontier": 3,
+      "iterations": 0,
+      "b*": 1.3733,
+      "time_s": 0.0003,
+      "valid": true
+    },
+    "hard": {
+      "algorithm": "BFS+backtracking",
+      "solved": true,
+      "aborted": false,
+      "generated": 2170,
+      "expanded": 1085,
+      "backtracks": 216,
+      "pruned": 865,
+      "max_depth": 13,
+      "max_frontier": 243,
+      "iterations": 0,
+      "b*": 1.6851,
+      "time_s": 0.0295,
+      "valid": true
+    }
+  },
+  "latin_5": {
+    "algorithm": "IDDFS+backtracking",
+    "solved": true,
+    "aborted": false,
+    "generated": 4173,
+    "expanded": 2877,
+    "backtracks": 0,
+    "pruned": 736,
+    "max_depth": 16,
+    "max_frontier": 0,
+    "iterations": 17,
+    "b*": 1.5818,
+    "time_s": 0.0143,
+    "valid": true
+  },
+  "latin_30": {
+    "algorithm": "IDDFS+backtracking",
+    "solved": true,
+    "aborted": false,
+    "generated": 1121,
+    "expanded": 841,
+    "backtracks": 0,
+    "pruned": 280,
+    "max_depth": 841,
+    "max_frontier": 0,
+    "iterations": 1,
+    "b*": 1.0007,
+    "time_s": 0.0294,
+    "valid": true
+  },
+  "trees": {
+    "8puzzle": {
+      "algorithm": "BFS (graph search)",
+      "nodes": 78,
+      "solution_depth": 5,
+      "expanded": 28,
+      "repeated": 27,
+      "frontier": 22,
+      "goal": 1
+    },
+    "missionaries_cannibals": {
+      "algorithm": "BFS (graph search)",
+      "nodes": 47,
+      "solution_depth": 11,
+      "expanded": 13,
+      "illegal": 18,
+      "repeated": 14,
+      "frontier": 1,
+      "goal": 1
+    },
+    "rws": {
+      "algorithm": "DFS + backtracking",
+      "nodes": 78,
+      "solution_depth": 21,
+      "expanded": 32,
+      "illegal": 45,
+      "goal": 1
+    }
+  }
+}
