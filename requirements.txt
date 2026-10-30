@@ -1,0 +1,2 @@
+matplotlib>=3.7   # vetëm për landscape.py
+# Graphviz 'dot' (sistem) për pemët: apt install graphviz / brew install graphviz

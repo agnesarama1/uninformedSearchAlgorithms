@@ -1,0 +1,96 @@
+{
+  "analytic_log10": {
+    "sudoku_hard": {
+      "empty": 60,
+      "naive_9^e": 57.25,
+      "row_permutations": 30.84,
+      "valid_sudoku_grids_total": 21.82
+    },
+    "latin_n8": {
+      "naive_n^(n^2)": 57.8,
+      "row_permutations_(n!)^n": 36.84,
+      "reduced_cells_n^((n-1)^2)": 44.25,
+      "latin_squares_L8": 20.04
+    },
+    "golfers_8_4_10": {
+      "naive_32^(320)": 481.65,
+      "partition_per_week": 19.77,
+      "partitions^10": 197.73,
+      "after_S1_S4": 172.4,
+      "subspace_model_C(155,10)": 15.21
+    }
+  },
+  "random_f": {
+    "Sudoku (hard)": {
+      "naive_mean": 102.02,
+      "naive_min": 73,
+      "structured_mean": 61.04,
+      "structured_min": 36,
+      "P(f=0)_observed": 0.0
+    },
+    "Latin square (n=8)": {
+      "naive_mean": 44.06,
+      "naive_min": 31,
+      "structured_mean": 21.95,
+      "structured_min": 12,
+      "P(f=0)_observed": 0.0
+    },
+    "Social golfers (8-4-10)": {
+      "naive_mean": 293.34,
+      "naive_min": 266,
+      "structured_mean": 163.08,
+      "structured_min": 140,
+      "P(f=0)_observed": 0.0
+    }
+  },
+  "ruggedness": {
+    "Sudoku (hard), swap brenda rreshtit": {
+      "rho(1)": 0.9389,
+      "correlation_length": 15.9,
+      "f_mean_on_walk": 61.7
+    },
+    "Latin n=8, swap brenda rreshtit": {
+      "rho(1)": 0.9263,
+      "correlation_length": 13.1,
+      "f_mean_on_walk": 21.8
+    },
+    "Golfers 8-4-10, swap mes grupeve": {
+      "rho(1)": 0.9697,
+      "correlation_length": 32.5,
+      "f_mean_on_walk": 162.9
+    }
+  },
+  "sudoku_bfs_max_layer": {
+    "static": 356783,
+    "MRV": 1003,
+    "MRV + propagim": 240
+  },
+  "latin6_iddfs_nodes_per_iteration": [
+    0,
+    5,
+    21,
+    60,
+    124,
+    177,
+    347,
+    910,
+    2056,
+    3610,
+    4674,
+    7306,
+    12966,
+    24082,
+    36122,
+    42674,
+    54082,
+    71490,
+    93378,
+    116466,
+    125874,
+    135282,
+    144690,
+    154098,
+    163506,
+    51
+  ]
+}
