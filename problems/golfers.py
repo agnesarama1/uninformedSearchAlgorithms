@@ -436,7 +436,8 @@ class SpreadGolfers(SearchProblem[list, int]):
         return weeks
 
 
-def solve_spread(d: int = 5, k: int = 2, weeks: int = 9, find_all: bool = False):
+def solve_spread(d: int = 5, k: int = 2, weeks: int = 9, find_all: bool = False,
+                 budget: Budget | None = None):
     """DFS over subspaces. Returns (weeks|None, stats).  The chosen indices are
     recovered by replaying the search path stored in the solution state."""
     pr = SpreadGolfers(d, k, weeks)
@@ -463,7 +464,7 @@ def solve_spread(d: int = 5, k: int = 2, weeks: int = 9, find_all: bool = False)
         return g
 
     pr.is_goal = is_goal
-    sols, st = depth_first_backtracking(pr)
+    sols, st = depth_first_backtracking(pr, budget)
     if not sols:
         return None, st, pr
     return pr.to_weeks(snapshot[0]), st, pr

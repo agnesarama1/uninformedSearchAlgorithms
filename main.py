@@ -57,7 +57,7 @@ def run_golfers(a) -> dict:
         k = (a.size - 1).bit_length()
         if 1 << d != n or 1 << k != a.size:
             sys.exit("modeli 'spread' kerkon n dhe p fuqi te 2-shit")
-        weeks, st, _ = G.solve_spread(d, k, a.weeks)
+        weeks, st, _ = G.solve_spread(d, k, a.weeks, budget=Budget(max_seconds=a.seconds))
     elif a.model == "restarts":
         r, st, runs = G.solve_with_restarts(a.groups, a.size, a.weeks, max_seconds=a.seconds)
         weeks = G.to_weeks(*r) if r else None
