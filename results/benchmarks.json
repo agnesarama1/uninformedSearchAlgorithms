@@ -11,7 +11,7 @@
     "max_frontier": 0,
     "iterations": 0,
     "b*": 1.7805,
-    "time_s": 0.0004,
+    "time_s": 0.0005,
     "valid": true
   },
   "golfers_8_4_6_restarts": {
@@ -20,13 +20,13 @@
     "aborted": false,
     "generated": 28348,
     "expanded": 13399,
-    "backtracks": 0,
+    "backtracks": 5568,
     "pruned": 14949,
     "max_depth": 160,
     "max_frontier": 0,
     "iterations": 2,
     "b*": 1.0455,
-    "time_s": 0.0595,
+    "time_s": 0.0607,
     "valid": true
   },
   "golfers_8_4_10_published": {
@@ -77,7 +77,7 @@
       "max_frontier": 1003,
       "iterations": 0,
       "b*": 1.1435,
-      "time_s": 0.0626,
+      "time_s": 0.0656,
       "valid": true
     }
   },
@@ -124,7 +124,7 @@
       "max_frontier": 243,
       "iterations": 0,
       "b*": 1.6851,
-      "time_s": 0.0295,
+      "time_s": 0.0299,
       "valid": true
     }
   },
@@ -140,7 +140,7 @@
     "max_frontier": 0,
     "iterations": 17,
     "b*": 1.5818,
-    "time_s": 0.0143,
+    "time_s": 0.0153,
     "valid": true
   },
   "latin_30": {
@@ -185,6 +185,11 @@
       "expanded": 32,
       "illegal": 45,
       "goal": 1
+    },
+    "rws_full_tree": {
+      "generated": 49374,
+      "pruned": 32611,
+      "solutions": 306
     }
   }
 }

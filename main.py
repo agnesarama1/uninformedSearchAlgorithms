@@ -115,15 +115,21 @@ def run_latin(a) -> dict:
                                       start_limit=D if a.start_at_depth else 0)
     print(f"  thellesia e zgjidhjes D = {D}")
     s = show_stats(st)
-    if st.aborted:
-        print("  budget-i u shterua; per n te madh perdor --start-at-depth")
     if st.nodes_per_iteration and len(st.nodes_per_iteration) <= 30:
         print(f"  nyje per iteracion: {st.nodes_per_iteration}")
+    if st.aborted and not a.start_at_depth:
+        print(f"  budget-i u shterua te L = {st.iterations - 1}; "
+              f"kaloj ne --start-at-depth (L = D = {D}, nje iteracion)")
+        sol, st = iterative_deepening_dfs(pr, Budget(max_seconds=a.seconds), start_limit=D)
+        s = show_stats(st)
+        s["fallback"] = "start_at_depth"
     if sol:
         ok = L.is_latin(sol.grid())
         print(f"  valid={ok}\n")
         print(L.fmt(sol.grid()))
         s["valid"] = ok
+    else:
+        print("  pa zgjidhje" + (" (budget-i u shterua)" if st.aborted else " (e vertetuar: hapesira u shterua)"))
     if a.cyclic:
         print("\n  Konstruksioni ciklik O(n^2) (identik me shembullin e detyres):")
         print(L.fmt(L.cyclic(a.n)))
@@ -150,12 +156,15 @@ def run_trees(a) -> dict:
 
     inst = T.RWSInstance()
     t = T.dfs_trace_tree(T.RWSProblem(inst), max_nodes=300)
-    T.render(T.to_dot(t, T.rws_label, "Rotating Workforce Scheduling — DFS + backtracking (pema e plotë)",
+    T.render(T.to_dot(t, T.rws_label, "Rotating Workforce Scheduling — DFS + backtracking (deri te zgjidhja e parë)",
                       rankdir="LR"), out_dir / "rws")
     res["rws"] = t.stats()
-    print("  RWS:", t.stats())
+    print("  RWS (deri te zgjidhja e pare):", t.stats())
     goal = t.nodes[t.solution[-1]].state
     print(T.rws_format(inst, goal), f"\n  f(x) = {T.rws_violations(inst, list(goal))}")
+    sols, full = depth_first_backtracking(T.RWSProblem(inst), find_all=True)
+    res["rws_full_tree"] = {"generated": full.generated, "pruned": full.pruned, "solutions": len(sols)}
+    print("  RWS (pema e plote):", res["rws_full_tree"])
     print(f"\n  Figurat: {out_dir}/*.svg, *.png")
     return res
 

@@ -13,7 +13,7 @@ from problems import golfers as G
 from problems import latin as L
 from problems import sudoku as SD
 from problems import trees as T
-from search.core import (Budget, breadth_first_search, depth_first_backtracking,
+from search.core import (Budget, SearchProblem, breadth_first_search, depth_first_backtracking,
                          iterative_deepening_dfs)
 
 
@@ -22,6 +22,41 @@ def run_cli(*argv: str) -> str:
     with contextlib.redirect_stdout(out):
         cli.main(list(argv))
     return out.getvalue()
+
+
+class AllChildrenRejected(SearchProblem):
+    """One root with two children, both rejected by apply(): exactly one dead end."""
+
+    def initial_state(self):
+        return []
+
+    def actions(self, state):
+        return [1, 2]
+
+    def is_goal(self, state):
+        return False
+
+    def apply(self, state, action):
+        return False, None
+
+    def undo(self, state, token):
+        pass
+
+    def copy(self, state):
+        return list(state)
+
+
+class TestEngine(unittest.TestCase):
+    def test_rejected_children_count_as_backtrack(self):
+        _, st = depth_first_backtracking(AllChildrenRejected())
+        self.assertEqual((st.backtracks, st.pruned), (1, 2))
+        _, st = iterative_deepening_dfs(AllChildrenRejected())
+        self.assertEqual((st.backtracks, st.pruned), (1, 2))
+
+    def test_iddfs_budget_applies_at_depth_limit(self):
+        _, st = iterative_deepening_dfs(L.LatinSquare(5), Budget(max_nodes=1), start_limit=1, max_limit=1)
+        self.assertTrue(st.aborted)
+        self.assertEqual(st.generated, 1)
 
 
 class TestSudoku(unittest.TestCase):
@@ -105,6 +140,11 @@ class TestLatin(unittest.TestCase):
         self.assertIn("iterations=1 ", out)
         self.assertIn("valid=True", out)
 
+    def test_cli_falls_back_when_iddfs_runs_out_of_budget(self):
+        out = run_cli("latin", "--n", "8", "--seconds", "0.2")
+        self.assertIn("--start-at-depth", out)
+        self.assertIn("valid=True", out)
+
     def test_cyclic_matches_task_example(self):
         self.assertEqual(L.cyclic(5), [[1, 2, 3, 4, 5], [5, 1, 2, 3, 4], [4, 5, 1, 2, 3],
                                        [3, 4, 5, 1, 2], [2, 3, 4, 5, 1]])
@@ -168,6 +208,13 @@ class TestTrees(unittest.TestCase):
         inst = T.RWSInstance()
         sols, _ = depth_first_backtracking(T.RWSProblem(inst))
         self.assertEqual(T.rws_violations(inst, sols[0]["seq"]), 0)
+
+    def test_rws_full_tree_goes_past_first_solution(self):
+        inst = T.RWSInstance()
+        sols, st = depth_first_backtracking(T.RWSProblem(inst), find_all=True)
+        self.assertGreater(len(sols), 1)
+        self.assertGreater(st.generated, len(T.dfs_trace_tree(T.RWSProblem(inst), max_nodes=300).nodes))
+        self.assertTrue(all(T.rws_violations(inst, s["seq"]) == 0 for s in sols))
 
 
 if __name__ == "__main__":

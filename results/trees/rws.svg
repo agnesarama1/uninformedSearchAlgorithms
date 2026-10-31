@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 878)">
 <title>G</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-878 2615.33,-878 2615.33,4 -4,4"/>
-<text xml:space="preserve" text-anchor="start" x="979.79" y="-852" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="20.00">Rotating Workforce Scheduling — DFS + backtracking (pema e plotë)</text>
+<text xml:space="preserve" text-anchor="start" x="940.04" y="-852" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="20.00">Rotating Workforce Scheduling — DFS + backtracking (deri te zgjidhja e parë)</text>
 <g id="clust1" class="cluster">
 <title>cluster_legend</title>
 <path fill="white" stroke="#dadce0" d="M20,-754C20,-754 583.88,-754 583.88,-754 589.88,-754 595.88,-760 595.88,-766 595.88,-766 595.88,-814 595.88,-814 595.88,-820 589.88,-826 583.88,-826 583.88,-826 20,-826 20,-826 14,-826 8,-820 8,-814 8,-814 8,-766 8,-766 8,-760 14,-754 20,-754"/>

@@ -1,16 +1,37 @@
 {
   "analytic_log10": {
+    "sudoku_easy": {
+      "empty": 49,
+      "naive_9^e": 46.76,
+      "product_of_domains": 23.18,
+      "row_permutations": 21.89,
+      "valid_sudoku_grids_total": 21.82
+    },
+    "sudoku_medium": {
+      "empty": 53,
+      "naive_9^e": 50.57,
+      "product_of_domains": 28.63,
+      "row_permutations": 25.14,
+      "valid_sudoku_grids_total": 21.82
+    },
     "sudoku_hard": {
       "empty": 60,
       "naive_9^e": 57.25,
+      "product_of_domains": 36.98,
       "row_permutations": 30.84,
       "valid_sudoku_grids_total": 21.82
+    },
+    "latin_n5": {
+      "naive_n^(n^2)": 17.47,
+      "row_permutations_(n!)^n": 10.4,
+      "reduced_cells_n^((n-1)^2)": 11.18,
+      "latin_squares_L(n)": 5.21
     },
     "latin_n8": {
       "naive_n^(n^2)": 57.8,
       "row_permutations_(n!)^n": 36.84,
       "reduced_cells_n^((n-1)^2)": 44.25,
-      "latin_squares_L8": 20.04
+      "latin_squares_L(n)": 20.04
     },
     "golfers_8_4_10": {
       "naive_32^(320)": 481.65,
@@ -21,43 +42,79 @@
     }
   },
   "random_f": {
+    "Sudoku (easy)": {
+      "naive_mean": 91.07,
+      "naive_min": 65,
+      "structured_mean": 49.77,
+      "structured_min": 30,
+      "P(f=0)_observed": 0.0
+    },
+    "Sudoku (medium)": {
+      "naive_mean": 94.91,
+      "naive_min": 64,
+      "structured_mean": 53.26,
+      "structured_min": 30,
+      "P(f=0)_observed": 0.0
+    },
     "Sudoku (hard)": {
-      "naive_mean": 102.02,
-      "naive_min": 73,
-      "structured_mean": 61.04,
+      "naive_mean": 102.28,
+      "naive_min": 71,
+      "structured_mean": 61.16,
       "structured_min": 36,
       "P(f=0)_observed": 0.0
     },
+    "Latin square (n=5)": {
+      "naive_mean": 16.43,
+      "naive_min": 9,
+      "structured_mean": 8.19,
+      "structured_min": 2,
+      "P(f=0)_observed": 0.0
+    },
     "Latin square (n=8)": {
-      "naive_mean": 44.06,
+      "naive_mean": 44.02,
       "naive_min": 31,
-      "structured_mean": 21.95,
-      "structured_min": 12,
+      "structured_mean": 22.03,
+      "structured_min": 13,
       "P(f=0)_observed": 0.0
     },
     "Social golfers (8-4-10)": {
-      "naive_mean": 293.34,
-      "naive_min": 266,
-      "structured_mean": 163.08,
-      "structured_min": 140,
+      "naive_mean": 292.93,
+      "naive_min": 257,
+      "structured_mean": 163.39,
+      "structured_min": 144,
       "P(f=0)_observed": 0.0
     }
   },
   "ruggedness": {
+    "Sudoku (easy), swap brenda rreshtit": {
+      "rho(1)": 0.9014,
+      "correlation_length": 9.6,
+      "f_mean_on_walk": 48.6
+    },
+    "Sudoku (medium), swap brenda rreshtit": {
+      "rho(1)": 0.926,
+      "correlation_length": 13.0,
+      "f_mean_on_walk": 52.2
+    },
     "Sudoku (hard), swap brenda rreshtit": {
-      "rho(1)": 0.9389,
-      "correlation_length": 15.9,
-      "f_mean_on_walk": 61.7
+      "rho(1)": 0.9466,
+      "correlation_length": 18.2,
+      "f_mean_on_walk": 62.0
+    },
+    "Latin n=5, swap brenda rreshtit": {
+      "rho(1)": 0.7725,
+      "correlation_length": 3.9,
+      "f_mean_on_walk": 8.2
     },
     "Latin n=8, swap brenda rreshtit": {
-      "rho(1)": 0.9263,
-      "correlation_length": 13.1,
-      "f_mean_on_walk": 21.8
+      "rho(1)": 0.9305,
+      "correlation_length": 13.9,
+      "f_mean_on_walk": 22.1
     },
     "Golfers 8-4-10, swap mes grupeve": {
-      "rho(1)": 0.9697,
-      "correlation_length": 32.5,
-      "f_mean_on_walk": 162.9
+      "rho(1)": 0.9745,
+      "correlation_length": 38.8,
+      "f_mean_on_walk": 162.5
     }
   },
   "sudoku_bfs_max_layer": {
