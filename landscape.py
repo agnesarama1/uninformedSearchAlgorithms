@@ -161,22 +161,34 @@ def corr_length(rho):
 
 
 # ---------------------------------------------------------------------------
+LATIN_SQUARES = {5: 161280, 8: 108776032459082956800}      # OEIS A002860
+
+
+def sudoku_sizes(puzzle):
+    givens = SD.parse(puzzle)
+    e = givens.count(0)
+    rows = [givens[r * 9:(r + 1) * 9] for r in range(9)]
+    st = SD.Sudoku(puzzle).initial_state()
+    return {"empty": e, "naive_9^e": round(e * log10(9), 2),
+            "product_of_domains": round(sum(log10(SD.Sudoku.candidates(st, i).bit_count())
+                                            for i in range(81) if givens[i] == 0), 2),
+            "row_permutations": round(sum(log10(factorial(row.count(0))) for row in rows), 2),
+            "valid_sudoku_grids_total": 21.82}                  # 6.67e21 (Felgenhauer & Jarvis)
+
+
+def latin_sizes(n):
+    return {"naive_n^(n^2)": round(n * n * log10(n), 2),
+            "row_permutations_(n!)^n": round(n * log10(factorial(n)), 2),
+            "reduced_cells_n^((n-1)^2)": round((n - 1) ** 2 * log10(n), 2),
+            "latin_squares_L(n)": round(log10(LATIN_SQUARES[n]), 2)}
+
+
 def analytic():
     """log10 of space sizes."""
-    hard = SD.parse(SD.PUZZLES["hard"])
-    e = hard.count(0)
-    rows = [hard[r * 9:(r + 1) * 9] for r in range(9)]
-    rowperm = sum(log10(factorial(row.count(0))) for row in rows)
     part = factorial(32) // (factorial(4) ** 8 * factorial(8))
-    n = 8
     return {
-        "sudoku_hard": {"empty": e, "naive_9^e": round(e * log10(9), 2),
-                        "row_permutations": round(rowperm, 2),
-                        "valid_sudoku_grids_total": 21.82},          # 6.67e21 (Felgenhauer & Jarvis)
-        "latin_n8": {"naive_n^(n^2)": round(n * n * log10(n), 2),
-                     "row_permutations_(n!)^n": round(n * log10(factorial(n)), 2),
-                     "reduced_cells_n^((n-1)^2)": round((n - 1) ** 2 * log10(n), 2),
-                     "latin_squares_L8": round(log10(108776032459082956800), 2)},
+        **{f"sudoku_{lvl}": sudoku_sizes(p) for lvl, p in SD.PUZZLES.items()},
+        **{f"latin_n{n}": latin_sizes(n) for n in LATIN_SQUARES},
         "golfers_8_4_10": {"naive_32^(320)": round(320 * log10(32), 2),
                            "partition_per_week": round(log10(part), 2),
                            "partitions^10": round(10 * log10(part), 2),
@@ -186,15 +198,16 @@ def analytic():
 
 
 def sample_f(samples=4000):
-    hard = SD.parse(SD.PUZZLES["hard"])
-    data = {
-        "Sudoku (hard)": ([f_sudoku(rand_sudoku_naive(hard)) for _ in range(samples)],
-                          [f_sudoku(rand_sudoku_rowperm(hard)) for _ in range(samples)]),
-        "Latin square (n=8)": ([f_latin(rand_latin_naive(8)) for _ in range(samples)],
-                               [f_latin(rand_latin_rowperm(8)) for _ in range(samples)]),
-        "Social golfers (8-4-10)": ([rand_golf_naive() for _ in range(samples // 4)],
-                                    [rand_golf_partition() for _ in range(samples // 4)]),
-    }
+    data = {}
+    for lvl, puzzle in SD.PUZZLES.items():
+        givens = SD.parse(puzzle)
+        data[f"Sudoku ({lvl})"] = ([f_sudoku(rand_sudoku_naive(givens)) for _ in range(samples)],
+                                   [f_sudoku(rand_sudoku_rowperm(givens)) for _ in range(samples)])
+    for n in LATIN_SQUARES:
+        data[f"Latin square (n={n})"] = ([f_latin(rand_latin_naive(n)) for _ in range(samples)],
+                                         [f_latin(rand_latin_rowperm(n)) for _ in range(samples)])
+    data["Social golfers (8-4-10)"] = ([rand_golf_naive() for _ in range(samples // 4)],
+                                       [rand_golf_partition() for _ in range(samples // 4)])
     return data
 
 
@@ -220,8 +233,8 @@ def plot(fdata, prof, iters, path_prefix: Path):
                          "axes.spines.top": False, "axes.spines.right": False})
 
     # Figure 1 - distribution of f on random configurations (small multiples)
-    fig, axes = plt.subplots(1, 3, figsize=(13, 3.6), facecolor="#fcfcfb")
-    for ax, (title, (naive, rep)) in zip(axes, fdata.items()):
+    fig, axes = plt.subplots(2, 3, figsize=(13, 7), facecolor="#fcfcfb")
+    for ax, (title, (naive, rep)) in zip(axes.flat, fdata.items()):
         ax.set_facecolor("#fcfcfb")
         lo, hi = 0, max(max(naive), max(rep))
         bins = min(60, hi - lo + 1)
@@ -233,8 +246,9 @@ def plot(fdata, prof, iters, path_prefix: Path):
         ax.set_axisbelow(True)
         ax.axvline(0, color=C3, linewidth=2)
         ax.text(0, ax.get_ylim()[1] * 0.92, " f = 0", color=INK, fontsize=8.5)
-    axes[0].set_ylabel("konfigurime të rastit")
-    axes[0].legend(frameon=False, fontsize=8.5, loc="upper right")
+    axes[0, 0].set_ylabel("konfigurime të rastit")
+    axes[1, 0].set_ylabel("konfigurime të rastit")
+    axes[0, 0].legend(frameon=False, fontsize=8.5, loc="upper right")
     fig.suptitle("Landscape: shpërndarja e objective function mbi konfigurime të rastit",
                  color=INK, fontsize=12.5, x=0.01, ha="left")
     fig.tight_layout()
@@ -282,9 +296,10 @@ def main():
                            "P(f=0)_observed": sum(1 for x in b if x == 0) / len(b)}
                        for k, (a, b) in fdata.items()}
     rug = {}
-    for name, fs in [("Sudoku (hard), swap brenda rreshtit", walk_sudoku(SD.parse(SD.PUZZLES["hard"]))),
-                     ("Latin n=8, swap brenda rreshtit", walk_latin(8)),
-                     ("Golfers 8-4-10, swap mes grupeve", walk_golf())]:
+    walks = [(f"Sudoku ({lvl}), swap brenda rreshtit", walk_sudoku(SD.parse(p))) for lvl, p in SD.PUZZLES.items()]
+    walks += [(f"Latin n={n}, swap brenda rreshtit", walk_latin(n)) for n in LATIN_SQUARES]
+    walks += [("Golfers 8-4-10, swap mes grupeve", walk_golf())]
+    for name, fs in walks:
         r1 = autocorr(fs, 1)
         rug[name] = {"rho(1)": round(r1, 4), "correlation_length": round(corr_length(r1), 1),
                      "f_mean_on_walk": round(sum(fs) / len(fs), 1)}

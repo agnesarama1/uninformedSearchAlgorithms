@@ -169,7 +169,7 @@ def depth_first_backtracking(
 
     stack: list[tuple[Iterator[A], Any]] = [(iter(problem.actions(state)), None)]
     stats.expanded += 1
-    produced_child = [False]  # per-level flag: did this node yield any child?
+    produced_child = [False]  # per-level flag: did any child of this node survive apply()?
 
     while stack:
         it, _ = stack[-1]
@@ -182,7 +182,6 @@ def depth_first_backtracking(
                 problem.undo(state, token)
             continue
 
-        produced_child[-1] = True
         stats.generated += 1
         depth = len(stack)
         stats.bump_depth(depth)
@@ -192,6 +191,7 @@ def depth_first_backtracking(
             problem.undo(state, token)
             continue
 
+        produced_child[-1] = True
         if problem.is_goal(state):
             solutions.append(problem.copy(state))
             stats.solved = True
@@ -331,15 +331,18 @@ def iterative_deepening_dfs(
                 if frame[1] is not None:
                     problem.undo(state, frame[1])
                 continue
-            frame[2] = True
             depth = len(stack)
             stats.generated += 1
             stats.bump_depth(depth)
+            if budget.exceeded(stats):                           # also covers nodes at the limit
+                stats.aborted = True
+                break
             ok, token = problem.apply(state, action)
             if not ok:
                 stats.pruned += 1
                 problem.undo(state, token)
                 continue
+            frame[2] = True
             if problem.is_goal(state):
                 result = problem.copy(state)
                 problem.undo(state, token)
@@ -348,10 +351,6 @@ def iterative_deepening_dfs(
                 cutoff = True
                 problem.undo(state, token)
                 continue
-            if budget.exceeded(stats):
-                stats.aborted = True
-                problem.undo(state, token)
-                break
             stats.expanded += 1
             stack.append([iter(problem.actions(state)), token, False])
         while stack:                                             # unwind
