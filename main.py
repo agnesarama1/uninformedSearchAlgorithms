@@ -16,7 +16,7 @@ import json
 import sys
 from pathlib import Path
 
-from search.core import (Budget, breadth_first_search, depth_first_backtracking,
+from search.core import (Budget, breadth_first_search, breadth_first_backtracking, depth_first_backtracking,
                          iterative_deepening_dfs)
 
 ROOT = Path(__file__).parent
@@ -88,12 +88,35 @@ def run_sudoku(a) -> dict:
     else:
         items = [(lvl, SD.PUZZLES[lvl]) for lvl in (["easy", "medium", "hard"] if a.level == "all" else [a.level])]
     for lvl, puzzle in items:
-        banner(f"2. SUDOKU [{lvl}]  clues={sum(c != '0' for c in puzzle)}  BFS + backtracking "
-               f"(ordering={a.ordering}, propagim={a.propagate})")
+        algorithm = (
+            "BFS + Backtracking Lookahead"
+            if a.solver == "bfs-bt"
+            else "BFS + Constraint Pruning"
+        )
+
+        banner(
+            f"2. SUDOKU [{lvl}] "
+            f"clues={sum(c != '0' for c in puzzle)} "
+            f"{algorithm} "
+            f"(ordering={a.ordering}, propagim={a.propagate})"
+        )
+
         print(SD.fmt(SD.parse(puzzle)))
         pr = SD.Sudoku(puzzle, a.ordering, a.propagate)
-        sol, st = breadth_first_search(pr, Budget(max_nodes=a.max_nodes, max_seconds=a.seconds))
-        print()
+        budget = Budget(
+            max_nodes=a.max_nodes,
+            max_seconds=a.seconds
+        )
+
+        if a.solver == "bfs-bt":
+            sol, st = breadth_first_backtracking(
+                pr,
+                budget,
+                lookahead_depth=a.lookahead_depth
+            )
+        else:
+            sol, st = breadth_first_search(pr, budget)
+            print()
         s = show_stats(st)
         if sol:
             ok = SD.is_valid_solution(sol.cells, pr.givens)
@@ -190,6 +213,17 @@ def main(argv=None):
     s.add_argument("--puzzle", type=str, default=None)
     s.add_argument("--max-nodes", type=int, default=5_000_000)
     s.add_argument("--seconds", type=float, default=120)
+    s.add_argument(
+        "--solver",
+        choices=["bfs", "bfs-bt"],
+        default="bfs"
+    )
+
+    s.add_argument(
+        "--lookahead-depth",
+        type=int,
+        default=2
+    )
 
     l_ = sub.add_parser("latin")
     l_.add_argument("--n", type=int, default=5)
@@ -221,6 +255,13 @@ def main(argv=None):
             "golfers_8_4_10_published": run_golfers(p.parse_args(["golfers", "--model", "published"])),
             "sudoku_mrv": run_sudoku(p.parse_args(["sudoku"])),
             "sudoku_mrv_propagate": run_sudoku(p.parse_args(["sudoku", "--propagate"])),
+            "sudoku_bfs_backtracking": run_sudoku(
+                p.parse_args([
+                    "sudoku",
+                    "--solver", "bfs-bt",
+                    "--propagate"
+                ])
+            ),
             "latin_5": run_latin(p.parse_args(["latin", "--n", "5", "--cyclic"])),
             "latin_30": run_latin(p.parse_args(["latin", "--n", "30", "--start-at-depth"])),
             "trees": run_trees(p.parse_args(["trees"])),

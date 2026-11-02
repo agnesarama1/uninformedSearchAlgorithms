@@ -283,6 +283,163 @@ def breadth_first_search(
     return None, stats
 
 
+
+# ---------------------------------------------------------------------------
+# BFS + Backtracking (bounded lookahead)
+# ---------------------------------------------------------------------------
+@dataclass
+class BFSBacktrackingStats(SearchStats):
+    lookahead_trials: int = 0
+    lookahead_backtracks: int = 0
+    undo_calls: int = 0
+
+    def summary(self):
+        return {
+            **super().summary(),
+            "lookahead_trials": self.lookahead_trials,
+            "lookahead_backtracks": self.lookahead_backtracks,
+            "undo_calls": self.undo_calls,
+        }
+
+
+class _BacktrackingBudgetReached(Exception):
+    pass
+
+
+def breadth_first_backtracking(
+    problem: SearchProblem[S, A],
+    budget: Budget | None = None,
+    lookahead_depth: int = 2,
+) -> tuple[S | None, BFSBacktrackingStats]:
+
+    if lookahead_depth < 0:
+        raise ValueError("lookahead_depth must be >= 0")
+
+    budget = budget or Budget()
+    stats = BFSBacktrackingStats(
+        algorithm="BFS + Backtracking Lookahead"
+    )
+
+    start = time.perf_counter()
+    root = problem.initial_state()
+    stats.bump_depth(0)
+
+    if problem.is_goal(root):
+        stats.solved = True
+        stats.elapsed = time.perf_counter() - start
+        return root, stats
+
+    frontier = deque([(root, 0)])
+
+    def check_budget():
+        total = stats.generated + stats.lookahead_trials
+
+        if budget.max_nodes is not None:
+            if total >= budget.max_nodes:
+                raise _BacktrackingBudgetReached
+
+        if budget.deadline is not None:
+            if time.perf_counter() > budget.deadline:
+                raise _BacktrackingBudgetReached
+
+    # -------------------------------------------------------
+    # BACKTRACKING: recursively try and undo assignments
+    # -------------------------------------------------------
+    def backtrack(state: S, remaining: int) -> bool:
+        check_budget()
+
+        if problem.is_goal(state):
+            return True
+
+        actions = list(problem.actions(state))
+
+        # No valid action -> dead end
+        if not actions:
+            stats.lookahead_backtracks += 1
+            return False
+
+        # Reached lookahead limit without contradiction
+        if remaining == 0:
+            return True
+
+        for action in actions:
+            check_budget()
+            stats.lookahead_trials += 1
+
+            ok, token = problem.apply(state, action)
+
+            try:
+                if ok and backtrack(state, remaining - 1):
+                    return True
+            finally:
+                # Restore the state before trying another action
+                problem.undo(state, token)
+                stats.undo_calls += 1
+
+        stats.lookahead_backtracks += 1
+        return False
+
+    # -------------------------------------------------------
+    # BFS: explore states level by level (FIFO)
+    # -------------------------------------------------------
+    try:
+        while frontier:
+            check_budget()
+
+            stats.max_frontier = max(
+                stats.max_frontier,
+                len(frontier)
+            )
+
+            state, depth = frontier.popleft()
+            stats.expanded += 1
+            produced = False
+
+            for action in list(problem.actions(state)):
+                check_budget()
+                stats.generated += 1
+
+                ok, token = problem.apply(state, action)
+
+                try:
+                    if not ok:
+                        stats.pruned += 1
+                        continue
+
+                    # Perform backtracking lookahead
+                    if lookahead_depth > 0:
+                        if not backtrack(state, lookahead_depth):
+                            stats.pruned += 1
+                            continue
+
+                    # Keep a separate copy for the BFS frontier
+                    child = problem.copy(state)
+                    produced = True
+
+                    stats.bump_depth(depth + 1)
+
+                    if problem.is_goal(child):
+                        stats.solved = True
+                        return child, stats
+
+                    frontier.append((child, depth + 1))
+
+                finally:
+                    problem.undo(state, token)
+                    stats.undo_calls += 1
+
+            if not produced:
+                stats.backtracks += 1
+
+    except _BacktrackingBudgetReached:
+        stats.aborted = True
+
+    finally:
+        stats.elapsed = time.perf_counter() - start
+
+    return None, stats
+
+
 # ---------------------------------------------------------------------------
 # Iterative Deepening DFS (depth-limited DFS with in-place backtracking)
 # ---------------------------------------------------------------------------
