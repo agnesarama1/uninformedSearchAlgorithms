@@ -13,8 +13,14 @@ from problems import golfers as G
 from problems import latin as L
 from problems import sudoku as SD
 from problems import trees as T
-from search.core import (Budget, SearchProblem, breadth_first_search, depth_first_backtracking,
-                         iterative_deepening_dfs)
+from search.core import (
+    Budget,
+    SearchProblem,
+    breadth_first_search,
+    breadth_first_backtracking,
+    depth_first_backtracking,
+    iterative_deepening_dfs
+)
 
 
 def run_cli(*argv: str) -> str:
@@ -216,6 +222,85 @@ class TestTrees(unittest.TestCase):
         self.assertGreater(st.generated, len(T.dfs_trace_tree(T.RWSProblem(inst), max_nodes=300).nodes))
         self.assertTrue(all(T.rws_violations(inst, s["seq"]) == 0 for s in sols))
 
+
+class TestSudokuBFSBacktracking(unittest.TestCase):
+
+    def test_bfs_backtracking_all_levels(self):
+        for level, puzzle in SD.PUZZLES.items():
+            for propagate in (False, True):
+                with self.subTest(
+                    level=level,
+                    propagate=propagate
+                ):
+                    problem = SD.Sudoku(
+                        puzzle,
+                        ordering="mrv",
+                        propagate=propagate
+                    )
+
+                    solution, stats = breadth_first_backtracking(
+                        problem,
+                        Budget(max_seconds=30),
+                        lookahead_depth=2
+                    )
+
+                    self.assertTrue(stats.solved)
+                    self.assertFalse(stats.aborted)
+                    self.assertIsNotNone(solution)
+
+                    self.assertTrue(
+                        SD.is_valid_solution(
+                            solution.cells,
+                            problem.givens
+                        )
+                    )
+
+    def test_backtracking_restores_state(self):
+        problem = SD.Sudoku(SD.PUZZLES["medium"])
+        state = problem.initial_state()
+
+        original = problem.copy(state)
+        action = next(iter(problem.actions(state)))
+
+        ok, token = problem.apply(state, action)
+        self.assertTrue(ok)
+
+        problem.undo(state, token)
+
+        self.assertEqual(state.cells, original.cells)
+        self.assertEqual(state.rows, original.rows)
+        self.assertEqual(state.cols, original.cols)
+        self.assertEqual(state.boxes, original.boxes)
+        self.assertEqual(state.empty, original.empty)
+
+    def test_backtracking_is_executed(self):
+        problem = SD.Sudoku(
+            SD.PUZZLES["medium"],
+            ordering="mrv",
+            propagate=False
+        )
+
+        solution, stats = breadth_first_backtracking(
+            problem,
+            lookahead_depth=2
+        )
+
+        self.assertIsNotNone(solution)
+        self.assertGreater(stats.lookahead_trials, 0)
+        self.assertGreater(stats.lookahead_backtracks, 0)
+        self.assertGreater(stats.undo_calls, 0)
+
+    def test_cli_new_solver(self):
+        output = run_cli(
+            "sudoku",
+            "--level", "medium",
+            "--solver", "bfs-bt",
+            "--propagate"
+        )
+
+        self.assertIn("valid=True", output)
+        self.assertIn("lookahead_trials=", output)
+        self.assertIn("undo_calls=", output)
 
 if __name__ == "__main__":
     unittest.main()
